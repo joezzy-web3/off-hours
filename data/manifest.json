@@ -1,0 +1,213 @@
+{
+ "recordedAt": "2026-10-10T09:26:37.046Z",
+ "source": "https://api.bitget.com/api/v2/mix/market/history-candles",
+ "granularity": "1H",
+ "columns": "t,open,high,low,close,baseVolume,quoteVolume",
+ "symbols": {
+  "NVDAUSDT": {
+   "bars": 10013,
+   "first": "2025-08-19T04:00:00.000Z",
+   "last": "2026-10-10T08:00:00.000Z",
+   "gaps": [],
+   "jumps": [],
+   "fundingRows": 270
+  },
+  "TSLAUSDT": {
+   "bars": 10013,
+   "first": "2025-08-19T04:00:00.000Z",
+   "last": "2026-10-10T08:00:00.000Z",
+   "gaps": [],
+   "jumps": [],
+   "fundingRows": 270
+  },
+  "AAPLUSDT": {
+   "bars": 9839,
+   "first": "2025-08-26T10:00:00.000Z",
+   "last": "2026-10-10T08:00:00.000Z",
+   "gaps": [],
+   "jumps": [],
+   "fundingRows": 270
+  },
+  "MSFTUSDT": {
+   "bars": 9191,
+   "first": "2025-09-22T10:00:00.000Z",
+   "last": "2026-10-10T08:00:00.000Z",
+   "gaps": [],
+   "jumps": [],
+   "fundingRows": 270
+  },
+  "METAUSDT": {
+   "bars": 9839,
+   "first": "2025-08-26T10:00:00.000Z",
+   "last": "2026-10-10T08:00:00.000Z",
+   "gaps": [],
+   "jumps": [],
+   "fundingRows": 270
+  },
+  "AMZNUSDT": {
+   "bars": 9839,
+   "first": "2025-08-26T10:00:00.000Z",
+   "last": "2026-10-10T08:00:00.000Z",
+   "gaps": [],
+   "jumps": [],
+   "fundingRows": 270
+  },
+  "GOOGLUSDT": {
+   "bars": 9839,
+   "first": "2025-08-26T10:00:00.000Z",
+   "last": "2026-10-10T08:00:00.000Z",
+   "gaps": [],
+   "jumps": [],
+   "fundingRows": 270
+  },
+  "MSTRUSDT": {
+   "bars": 9817,
+   "first": "2025-08-27T08:00:00.000Z",
+   "last": "2026-10-10T08:00:00.000Z",
+   "gaps": [],
+   "jumps": [],
+   "fundingRows": 270
+  },
+  "COINUSDT": {
+   "bars": 9817,
+   "first": "2025-08-27T08:00:00.000Z",
+   "last": "2026-10-10T08:00:00.000Z",
+   "gaps": [],
+   "jumps": [],
+   "fundingRows": 270
+  },
+  "PLTRUSDT": {
+   "bars": 9504,
+   "first": "2025-09-09T09:00:00.000Z",
+   "last": "2026-10-10T08:00:00.000Z",
+   "gaps": [],
+   "jumps": [],
+   "fundingRows": 270
+  },
+  "QQQUSDT": {
+   "bars": 8326,
+   "first": "2025-10-28T11:00:00.000Z",
+   "last": "2026-10-10T08:00:00.000Z",
+   "gaps": [],
+   "jumps": [],
+   "fundingRows": 270
+  },
+  "SPYUSDT": {
+   "bars": 5780,
+   "first": "2026-02-11T13:00:00.000Z",
+   "last": "2026-10-10T08:00:00.000Z",
+   "gaps": [],
+   "jumps": [],
+   "fundingRows": 270
+  },
+  "BTCUSDT": {
+   "bars": 63574,
+   "first": "2019-07-10T11:00:00.000Z",
+   "last": "2026-10-10T08:00:00.000Z",
+   "gaps": [],
+   "jumps": [
+    {
+     "at": "2019-07-14T16:00:00.000Z",
+     "previousClose": 10305.5,
+     "open": 10415.5
+    },
+    {
+     "at": "2021-01-02T03:00:00.000Z",
+     "previousClose": 23301,
+     "open": 29347
+    },
+    {
+     "at": "2021-05-23T22:00:00.000Z",
+     "previousClose": 33988.5,
+     "open": 34179
+    },
+    {
+     "at": "2021-06-06T06:00:00.000Z",
+     "previousClose": 36233,
+     "open": 36425.5
+    },
+    {
+     "at": "2021-06-11T03:00:00.000Z",
+     "previousClose": 36327.5,
+     "open": 36731
+    },
+    {
+     "at": "2021-06-16T18:00:00.000Z",
+     "previousClose": 39177.5,
+     "open": 38841.5
+    },
+    {
+     "at": "2021-06-20T15:00:00.000Z",
+     "previousClose": 34217.5,
+     "open": 34395
+    },
+    {
+     "at": "2021-06-21T23:00:00.000Z",
+     "previousClose": 31274.5,
+     "open": 31461
+    },
+    {
+     "at": "2021-06-24T17:00:00.000Z",
+     "previousClose": 34499,
+     "open": 34731.5
+    }
+   ],
+   "fundingRows": 270
+  },
+  "ETHUSDT": {
+   "bars": 62834,
+   "first": "2019-08-10T07:00:00.000Z",
+   "last": "2026-10-10T08:00:00.000Z",
+   "gaps": [],
+   "jumps": [
+    {
+     "at": "2019-09-08T11:00:00.000Z",
+     "previousClose": 181.52,
+     "open": 178.98
+    },
+    {
+     "at": "2021-04-03T10:00:00.000Z",
+     "previousClose": 2092.98,
+     "open": 2110.43
+    },
+    {
+     "at": "2021-06-01T11:00:00.000Z",
+     "previousClose": 2575.51,
+     "open": 2597.23
+    },
+    {
+     "at": "2021-06-09T12:00:00.000Z",
+     "previousClose": 2534.32,
+     "open": 2556.8
+    },
+    {
+     "at": "2021-06-22T13:00:00.000Z",
+     "previousClose": 1809.62,
+     "open": 1786.94
+    },
+    {
+     "at": "2021-06-23T02:00:00.000Z",
+     "previousClose": 1993.89,
+     "open": 2006.85
+    },
+    {
+     "at": "2021-07-26T20:00:00.000Z",
+     "previousClose": 2368.59,
+     "open": 2345.2
+    }
+   ],
+   "fundingRows": 270
+  },
+  "SOLUSDT": {
+   "bars": 45727,
+   "first": "2021-07-23T02:00:00.000Z",
+   "last": "2026-10-10T08:00:00.000Z",
+   "gaps": [],
+   "jumps": [],
+   "fundingRows": 270
+  }
+ },
+ "notListed": [],
+ "errors": [],
+ "rwaContractsListed": 354
+}
