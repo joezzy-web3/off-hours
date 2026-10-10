@@ -6,7 +6,7 @@
 
 You answer it, a rules-only agent answers it, a language model answers it, and outside agents answer it. Every answer is fixed before the outcome exists, and one piece of code grades them all.
 
-**Live site:** `REPLACE-WITH-YOUR-SITE-LINK` &nbsp;·&nbsp; [The study](docs/STUDY.md) &nbsp;·&nbsp; [Technical document](docs/TECHNICAL.md) &nbsp;·&nbsp; [Rules fixed in advance](research/PREREGISTRATION.md) &nbsp;·&nbsp; [Two-minute tour](public/tour.mp4)
+**Live site:** `https://bellwether-app.netlify.app/` &nbsp;·&nbsp; [The study](docs/STUDY.md) &nbsp;·&nbsp; [Technical document](docs/TECHNICAL.md) &nbsp;·&nbsp; [Rules fixed in advance](research/PREREGISTRATION.md) &nbsp;·&nbsp; [Two-minute tour](public/tour.mp4)
 
 Built for the Bitget AI Hackathon, Season 2. No sign-up. Opens on recorded real data.
 
