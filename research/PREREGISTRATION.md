@@ -34,7 +34,7 @@ acting at once or waiting for the open?
 - Move at a decision hour: m = P / C0 - 1.
 - Scale: s = the standard deviation of the contract's last 20 cash-close to cash-close returns
   ending at D. A contract with fewer than 10 is not eligible in that window. Nothing after D is used.
-- Event: the first decision hour in the window at which |m| >= 1 x s. At most one event per
+- Event: the first decision hour in the window at which |m| >= 0.5 x s, half a normal day's move. At most one event per
   contract per window. P_trigger is the price at that hour.
 - Outcome price P_out: the close of the hourly bar that ends 90 minutes after the open of N.
 - Outcome: Y = sign(m) x (P_out / P_trigger - 1). Positive means the move went further after the
@@ -58,14 +58,14 @@ P_out, (P_out / C0 - 1) / m.
 
 ## Baseline
 
-The same Y for windows in which the contract never reached 1 x s, measured from the last
+The same Y for windows in which the contract never reached 0.5 x s, measured from the last
 decision hour in the direction of the move at that hour. The difference between events and
 baseline is reported with its interval.
 
 ## Breakdowns, all reported, none chosen afterwards
 
 Overnight against weekend or holiday. Up moves against down moves. Trigger in the first four
-hours after the close, in the hours after that, or from 04:00 New York time. Thresholds of 0.5,
+hours after the close, in the hours after that, or from 04:00 New York time. Thresholds of 1,
 1.5 and 2 x s, and a flat 2%. Each contract alone. MSTR and COIN against the rest. Outcome
 measured 30 minutes after the open and at the cash close of N. No breakdown becomes a headline
 unless its interval excludes zero after allowing for the number of breakdowns shown (Bonferroni).
@@ -74,8 +74,8 @@ unless its interval excludes zero after allowing for the number of breakdowns sh
 
 At each event the forecaster uses only events from earlier closed windows.
 
-- Class: the window's kind (overnight; weekend or holiday) and the move's size (under 2 x s;
-  2 x s or more). A class with fewer than 30 earlier events falls back to all earlier events.
+- Class: the window's kind (overnight; weekend or holiday) and the move's size at the trigger (under 1 x s;
+  1 x s or more). A class with fewer than 30 earlier events falls back to all earlier events.
   With fewer than 30 of those, no forecast is made and the event is counted as such.
 - Range forecast: the 10th and 90th percentiles of Y / s in the class, turned back into prices
   with this event's own s, direction and P_trigger. It is an 80% range for P_out.
@@ -140,8 +140,16 @@ nothing earlier.
 - Two pages of NVDA hourly bars (20 February to 1 March and 21 to 29 August 2026) were fetched to
   confirm that Bitget serves history that far back. They were not analysed.
 
+- The engine's first run on the exploration set, at a threshold of 1 x s: 7 events in 126
+  contract-windows, of which 5 held and 3 went further after the trigger. Then a count of
+  events only, with no outcomes, at 0.25, 0.5, 0.75, 1 and 1.5 x s: 100, 49, 18, 7 and 2.
+
 ## Changes after registration
 
 - 10 October 2026, before any test data was read: a claim about hedging was removed and the
   forecast, timing and scoring sections were added, when the product became a forecaster with
   an order rule and a scored game. The data, definitions and primary result were not changed.
+- 10 October 2026, before any data was recorded: the event threshold was lowered from 1 x s to
+  0.5 x s, and the size classes moved from 2 x s to 1 x s to match. Reason: 7 events in 40 days
+  is too few to forecast from. The choice was made on the number of events alone. 1 x s stays
+  in the breakdowns.
