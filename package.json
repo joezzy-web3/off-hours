@@ -1,0 +1,32 @@
+{
+  "name": "bellwether",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "build:netlify": "node scripts/build.mjs --netlify",
+    "build:mcp": "node scripts/build.mjs --mcp",
+    "dev": "node scripts/build.mjs --netlify && node scripts/dev.mjs",
+    "pretest": "node scripts/build.mjs --mcp",
+    "test": "tsx --test tests/*.test.ts && node --test tests/recorders.test.mjs",
+    "typecheck": "tsc --noEmit",
+    "agent": "node scripts/fetch-recent.mjs && tsx scripts/agent.ts",
+    "study": "tsx research/study.ts && python3 research/audit.py",
+    "mcp": "node dist/mcp/bellwether.mjs"
+  },
+  "dependencies": {
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "esbuild": "^0.28.2",
+    "tsx": "^4.23.12",
+    "typescript": "^6.0.3"
+  },
+  "description": "Bellwether: call whether a Bitget stock perp's off-hours move holds at the opening bell, against an agent whose forecasts are sealed before the outcome."
+}

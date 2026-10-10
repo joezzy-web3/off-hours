@@ -153,3 +153,22 @@ nothing earlier.
   0.5 x s, and the size classes moved from 2 x s to 1 x s to match. Reason: 7 events in 40 days
   is too few to forecast from. The choice was made on the number of events alone. 1 x s stays
   in the breakdowns.
+- For the record on timing: that change was written before the first recording job started.
+  The job started at 09:26 UTC, four minutes before the change was committed to the
+  repository, and finished after it. The commit that changes the rules is earlier than the
+  commit that adds the data, and no recorded data had been read.
+- 10 October 2026, after the data was recorded and before any of it was run through the
+  engine: the history turned out to begin on 19 August 2025, not in 2026. The calendar was
+  extended to 2025 under the same rule (closed on 1 Sep, 27 Nov and 25 Dec 2025; the early
+  closes of 28 Nov and 24 Dec 2025 left out; winter hours from 2 Nov 2025). The test set keeps
+  its definition: each contract's first bar up to the cash close of 28 August 2026.
+- 10 October 2026, after the first results had been read: an independent review of the first
+  draft found three things, recorded in docs/STUDY.md. (1) The study had been run with 20,000
+  resamples where this document says 10,000; it was re-run with 10,000 and no reading changed.
+  (2) The contracts did not trade at weekends until February 2026; a split around that date
+  was added to the study and is labelled there as not fixed in advance. (3) A reading of this
+  document that it leaves open: sessions that close early are left out as closed windows, but
+  their 13:00 close is still used as that day's close in the scale.
+- Not a change, but stated for completeness: a required bar that is missing causes that hour
+  to be skipped, not counted separately. The recorded history has no missing hours, so this
+  never happened.

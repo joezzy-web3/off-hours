@@ -1,0 +1,6 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist/web",
+  "framework": null,
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- src api scripts public package.json vercel.json || exit 1"
+}

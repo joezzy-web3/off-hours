@@ -1,0 +1,49 @@
+# The house, unattended. Every hour: append the Bitget candles that have closed,
+# replay the house to this hour with nothing changed, let the language-model
+# player call any new board, and publish the result in live/.
+#
+# Needs no secrets to run. To switch the language-model player on, add three
+# repository secrets (Settings > Secrets and variables > Actions):
+#   LLM_BASE_URL   an OpenAI-compatible endpoint
+#   LLM_API_KEY    its key
+#   LLM_MODEL      the model name
+#   LLM_LABEL      optional: the name shown on the league table (default "language model")
+# To run it by hand: Actions tab, "agent", "Run workflow".
+name: agent
+on:
+  schedule:
+    - cron: '12 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: data
+  cancel-in-progress: false
+jobs:
+  hour:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --no-audit --no-fund
+      - name: Append the hours that have closed
+        run: node scripts/fetch-recent.mjs
+      - name: Replay the house and publish
+        run: npx tsx scripts/agent.ts
+        env:
+          LLM_BASE_URL: ${{ secrets.LLM_BASE_URL }}
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          LLM_MODEL: ${{ secrets.LLM_MODEL }}
+          LLM_LABEL: ${{ secrets.LLM_LABEL }}
+      - name: Commit
+        run: |
+          git config user.name "bellwether-agent"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data live research/FORWARD.md research/ROLLING.md
+          if git diff --cached --quiet; then echo "Nothing new."; exit 0; fi
+          git commit -m "Agent: house replayed to this hour"
+          git pull --rebase
+          git push
