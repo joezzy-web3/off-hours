@@ -147,6 +147,45 @@ export function claim2(set: Row[]) {
   };
 }
 
+/**
+ * NOT fixed in advance. Added after publication, when a reader pointed out that 50% is the
+ * wrong bar for the hold forecast: about two moves in three hold, so "always holds" is right
+ * about two times in three. This sets the house against the plain base rate.
+ *
+ * The running base rate for a session is the share of all moves in earlier sessions that held.
+ * Every earlier session is graded before the next one opens, so it uses nothing the house
+ * could not have known, and it knows nothing about the night in question.
+ */
+export function baseRate(set: Row[]) {
+  const fc = set.filter((r) => r.forecast);
+  const o = (r: Row) => (r.held ? 1 : 0);
+  const sessions = new Map<string, Row[]>();
+  for (const r of set) sessions.set(r.window, [...(sessions.get(r.window) ?? []), r]);
+  const prior = new Map<string, number>();
+  let held = 0, seen = 0;
+  for (const id of [...sessions.keys()].sort()) {
+    prior.set(id, seen ? held / seen : 0.5);
+    for (const r of sessions.get(id)!) { held += o(r); seen++; }
+  }
+  const pts = (p: number, r: Row) => 100 * (0.25 - (p - o(r)) ** 2);
+  const running = (r: Row) => prior.get(r.window)!;
+  const mean = (f: (r: Row) => number) => (fc.length ? fc.reduce((a, r) => a + f(r), 0) / fc.length : NaN);
+  const always = mean(o);
+  return {
+    events: fc.length,
+    lowestForecast: Math.min(...fc.map((r) => r.pHold!)), highestForecast: Math.max(...fc.map((r) => r.pHold!)),
+    saidHolds: fc.filter((r) => r.pHold! >= 0.5).length,
+    houseHit: mean((r) => ((r.pHold! >= 0.5) === r.held ? 1 : 0)),
+    alwaysHoldsHit: always,
+    housePoints: clustered(fc, w, (r) => r.points!),
+    runningPoints: clustered(fc, w, (r) => pts(running(r), r)),
+    difference: clustered(fc, w, (r) => r.points! - pts(running(r), r)),
+    houseBrier: mean((r) => (r.pHold! - o(r)) ** 2),
+    runningBrier: mean((r) => (running(r) - o(r)) ** 2),
+    hindsightBrier: always * (1 - always),
+  };
+}
+
 /** Claim 3: does the order rule add timing value before costs? */
 export function claim3(set: Row[]) {
   const fc = set.filter((r) => r.forecast);

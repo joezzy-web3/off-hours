@@ -1068,6 +1068,38 @@
    "shareAtLeastOneScale": 0.06297872340425532,
    "sdOfY": 0.02465357575442052
   },
+  "baseRate": {
+   "events": 1143,
+   "lowestForecast": 0.5460526315789473,
+   "highestForecast": 0.7611940298507462,
+   "saidHolds": 1143,
+   "houseHit": 0.6334208223972003,
+   "alwaysHoldsHit": 0.6334208223972003,
+   "housePoints": {
+    "mean": 1.5110664983550623,
+    "lo": 0.49505746553576174,
+    "hi": 2.503264465491372,
+    "n": 1143,
+    "windows": 212
+   },
+   "runningPoints": {
+    "mean": 1.5937230465999443,
+    "lo": 0.5499708242299225,
+    "hi": 2.6208798259389345,
+    "n": 1143,
+    "windows": 212
+   },
+   "difference": {
+    "mean": -0.08265654824488164,
+    "lo": -0.3998104406883959,
+    "hi": 0.22849039339948146,
+    "n": 1143,
+    "windows": 212
+   },
+   "houseBrier": 0.23488933501644935,
+   "runningBrier": 0.23406276953400093,
+   "hindsightBrier": 0.23219888415085474
+  },
   "hoursOfHistory": 10013,
   "firstBars": {
    "NVDA": 1755576000000,

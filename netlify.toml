@@ -10,10 +10,16 @@
 [build.environment]
   NODE_VERSION = "22"
 
-# One function serves every server route. It is bundled by the build command.
+# One function serves every server route; a second is the hourly clock. Both are bundled by the build command.
 [functions]
   directory = "dist/netlify/functions"
   node_bundler = "esbuild"
+
+# The clock. GitHub's own scheduler can start late or skip a run, so this function starts the
+# agent's workflow three minutes after every hour (UTC). It needs GITHUB_DISPATCH_TOKEN in
+# the site's environment variables and does nothing without it.
+[functions."tick"]
+  schedule = "3 * * * *"
 
 [[redirects]]
   from = "/api/*"

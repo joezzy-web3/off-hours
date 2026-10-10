@@ -56,7 +56,7 @@ flowchart LR
   X -->|bellwether_call| S
 ```
 
-Everything above the web app runs on GitHub Actions on a schedule, with nobody watching. The web app has no database of its own for the house: it reads the files the agent commits.
+Everything above the web app runs on GitHub Actions every hour, with nobody watching. The web app has no database of its own for the house: it reads the files the agent commits.
 
 ## 2. Repository map
 
@@ -76,7 +76,7 @@ Everything above the web app runs on GitHub Actions on a schedule, with nobody w
 | `src/core/bitget.ts` | Server-side Bitget client: order books and signed demo orders |
 | `src/core/season.ts`, `board.ts` | Seeded dealing; the shape of a board |
 | `src/ui/` | The React app |
-| `api/`, `netlify/api.ts` | Server routes; the Netlify adapter that serves them from one function |
+| `api/`, `netlify/api.ts`, `netlify/tick.ts` | Server routes; the Netlify adapter that serves them from one function; the hourly clock |
 | `mcp/bellwether.ts`, `skills/bellwether/SKILL.md` | MCP tool server and Agent Hub skill file |
 | `scripts/fetch-history.mjs` | Records the full history once |
 | `scripts/fetch-recent.mjs`, `record-book.mjs`, `agent.ts` | The hourly jobs |
@@ -242,7 +242,7 @@ hash = SHA-256( prev + canonical({ seq, at, kind, body }) )
 
 ## 7. The hourly agent
 
-`.github/workflows/agent.yml` runs at 12 minutes past every hour:
+`.github/workflows/agent.yml` runs every hour. Two things can start it. The host's scheduled function `netlify/tick.ts` starts the order-book recorder and then the agent three minutes after every hour, through GitHub's workflow-dispatch API; it needs `GITHUB_DISPATCH_TOKEN` in the host's environment and does nothing without it. GitHub's own schedule (12 minutes past) stays in the workflow file as a second trigger. The second trigger exists because the first did not work: on launch day GitHub's scheduler started none of the hourly runs. A run that finds nothing new commits nothing, so two triggers do no harm. Each run:
 
 1. `node scripts/fetch-recent.mjs` appends the hours that have closed to `data/recent/<SYMBOL>.csv`. `data/hourly` is never rewritten, so the study's inputs cannot change. A response with an impossible bar (a non-positive price, or a range that does not contain its open and close) aborts that contract's append.
 2. `npx tsx scripts/agent.ts`:
@@ -413,7 +413,7 @@ What this does **not** protect against: Bitget's own data being wrong; a league 
 | `tests/core.test.ts` | 12 | SHA-256 matches Node's; New York hours in both seasons, holidays, early closes; the view refuses unclosed bars; quantile, scale, points, plan, timing; forecast fallback; a call is made at the right hour and graded after the bell; **no look-ahead** on a synthetic market; replay equals live, one hour at a time; any edit, removal, reordering or backdating of the ledger is detected; seeded dealing |
 | `tests/study.test.ts` | 2 | **No look-ahead on the recorded Bitget candles**; the published ledger tail, call count and resample count are what the frozen house produces |
 | `tests/live.test.ts` | 7 | Live calls are only those seen before their outcome and the replay record never changes; the agent refuses to publish when an old candle changes; the model player makes one sealed call per board, sits out on unreadable answers, and never calls after the bell; the answer guard; league rules; the cost panel; every kind of question in Ask is read correctly and a rewording cannot add a number; intervals are reproducible |
-| `tests/server.test.ts` | 6 | Status leaks no secret; the league over a real SQL engine speaking D1's REST shape; demo orders are signed, marked demo, bounded, and never echo a secret; live order books; rewording is used only when it adds no number; the MCP server answers `initialize`, `tools/list` and tool calls |
+| `tests/server.test.ts` | 6 | Status leaks no secret, and the hourly clock starts both workflows only when it holds a token; the league over a real SQL engine speaking D1's REST shape; demo orders are signed, marked demo, bounded, and never echo a secret; live order books; rewording is used only when it adds no number; the MCP server answers `initialize`, `tools/list` and tool calls |
 | `tests/docs.test.ts` | 1 | The figures quoted in the README are the ones in `research/results.json` |
 | `tests/recorders.test.mjs` | 2 | The history recorder pages back to the first bar, keeps a gap as a gap and skips unlisted contracts; the order-book recorder reaches 50 basis points on a high-priced contract |
 
@@ -432,11 +432,12 @@ Beyond these, the whole app was walked in a browser against a local server on de
 
 | Variable | Purpose |
 | --- | --- |
+| `GITHUB_DISPATCH_TOKEN` | The hourly clock. A fine-grained GitHub token for this repository with Actions read and write, used only to start the two workflows |
 | `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_D1_DATABASE_ID`, `CLOUDFLARE_API_TOKEN` | Make the league permanent |
 | `LLM_BASE_URL`, `LLM_API_KEY`, `LLM_MODEL` | Let Ask reword its answers |
 | `BELLWETHER_FEED` | Where the server reads live files from, if not this repository |
 
-**Netlify.** `netlify.toml` sets the build command, the publish folder and one function, and redirects `/api/*` to it. Its `ignore` line skips the build for the agent's hourly data commits, which change nothing the site is built from.
+**Netlify.** `netlify.toml` sets the build command, the publish folder, one function for the server routes (with `/api/*` redirected to it) and one scheduled function, the hourly clock. Its `ignore` line skips the build for the agent's hourly data commits, which change nothing the site is built from.
 
 **Vercel.** `vercel.json` sets the build command and output folder; the files in `api/` are picked up as functions. Its `ignoreCommand` does the same job. This configuration follows the same pattern as the Netlify one but has not been run on Vercel.
 
@@ -447,10 +448,10 @@ Beyond these, the whole app was walked in a browser against a local server on de
 ## 20. Known limits
 
 - The study's limits are listed in [STUDY.md](STUDY.md#what-the-study-did-not-show). The most important: it is a null result with a margin of about 19 basis points; it measured the perp's own prices and nothing about cost; and the contracts did not trade at weekends before February 2026.
-- The house is a base-rate table. It cannot tell a strong night from a weak one.
+- The house is a base-rate table. It cannot tell a strong night from a weak one, and its hold forecast does not beat a single running base rate. See [the section added after publication](STUDY.md#raised-after-publication-the-house-against-the-base-rate).
 - Prices are hourly. Nothing finer is recorded.
 - The league has no defence against one person registering many names.
 - The demo-order route has been tested against a mock exchange only.
 - The Vercel configuration has not been run.
-- GitHub's scheduler can start a job several minutes late, and occasionally skips one. The agent processes every hour since its last run, so a late run loses nothing, but a call it first sees after the grade hour is counted as replay, not live.
+- GitHub's scheduler can start a job late or not at all, which is why the host starts the hourly run as well. The agent processes every hour since its last run, so a late run loses nothing, but a call it first sees after the grade hour is counted as replay, not live.
 - The holiday calendar ends in 2027.

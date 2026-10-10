@@ -60,10 +60,11 @@ Every figure in this section is **observed**: computed by [`research/study.ts`](
 | How many moves still have half their size standing? | **63.6%** | 59.5% to 67.5% | About two in three |
 | How many moves went further after the call? | **49.0%** | 44.9% to 53.0% | A coin toss |
 | How often did the outcome land inside the house's 80% price range? | **78.2%** | 74.8% to 81.6% | Calibrated on average. It under-covers large moves |
-| What did the house score per call? (0 is what saying 50% every time scores) | **1.51 points** | 0.50 to 2.50 | It knows the base rate and little more |
+| What did the house score per call? (0 is what saying 50% every time scores) | **1.51 points** | 0.50 to 2.50 | Above zero, but 50% is the wrong bar: two moves in three hold |
+| Does the house's hold forecast beat a plain running base rate? | **-0.08 points** | -0.40 to +0.23 | No. The interval contains zero. The house is the base rate and nothing more |
 | What did the order rule add against "half now, half later"? | **0.0 bp** | -1.7 to +1.6 | Nearly empty test: the rule left half-and-half on 15 of 1,143 moves |
 
-In plain words: **in this data nothing favours rushing to act on an off-hours move, and nothing favours waiting for it to reverse.** The data cannot rule out an average of about 19 basis points either way. That is a null result, reported as one.
+In plain words: **in this data nothing favours rushing to act on an off-hours move, and nothing favours waiting for it to reverse.** The data cannot rule out an average of about 19 basis points either way. That is a null result, reported as one. The house itself has no skill at telling one night from another: on the held-or-faded question it is right 63.3% of the time, exactly what always saying "holds" scores. It is the bar to beat, not a signal.
 
 **What is targeted, not observed:**
 
@@ -194,7 +195,7 @@ The engine in six lines (full formulas in the [technical document](docs/TECHNICA
 5. **The outcome** is the hourly close 90 minutes after the bell. A move **held** if at least half of it is still standing.
 6. **Points** are `100 x (0.25 - (p - outcome)^2)`: saying 50% always scores zero, and overconfidence is punished harder than doubt.
 
-Stack: React and TypeScript, bundled by esbuild, hand-written CSS, two runtime dependencies. Server routes are plain functions that run on Netlify or Vercel. The house runs on GitHub Actions and publishes by committing files, so the site needs no database for the record and no redeploy for new data.
+Stack: React and TypeScript, bundled by esbuild, hand-written CSS, two runtime dependencies. Server routes are plain functions that run on Netlify or Vercel. The house runs on GitHub Actions and publishes by committing files, so the site needs no database for the record and no redeploy for new data. Its hourly run is started by a scheduled function on the host, with GitHub's own schedule kept as a second trigger.
 
 ## The study on one page
 
@@ -213,7 +214,7 @@ Stack: React and TypeScript, bundled by esbuild, hand-written CSS, two runtime d
 **What the study did not show**
 
 - **An edge.** The headline is a null result. Nothing here supports selling at once after an off-hours fall, or waiting for a rebound. Nothing proves there is no edge either.
-- **Skill at telling nights apart.** The house's higher forecasts did not hold more often.
+- **Skill at telling nights apart.** The house's higher forecasts did not hold more often, and its hold forecast does not beat a plain running base rate.
 - **Profit.** No strategy was tested for profit and none is claimed.
 - **Cost.** Candles hold no spread or depth. Any statement that cost is what matters is a guess, not a finding.
 - **Anything about the shares.** Every price is the perp's own.
@@ -229,6 +230,10 @@ A separate reviewer re-derived every call, then found three faults in the first 
 1. Weekend halts before February 2026 were not disclosed. They are now, with a split around the date.
 2. The summary claimed more than a null result supports. Those sentences are gone.
 3. The number of resamples differed from the pre-registration. It now matches.
+
+**What a reader changed after launch**
+
+Within hours of the launch post a reader objected that 63.6% of moves hold, so beating 50% proves nothing; the house has to be measured against the base rate. That is correct. The rules fixed in advance compared the house with 50% only. The comparison with a running base rate was added the same day, labelled as not fixed in advance: the house scores 1.51 points a call and the base rate 1.59. See [the section in the study](docs/STUDY.md#raised-after-publication-the-house-against-the-base-rate).
 
 ## Why the record can be trusted
 
@@ -275,6 +280,7 @@ Contracts: NVDA, TSLA, AAPL, MSFT, META, AMZN, GOOGL, MSTR, COIN, PLTR, QQQ and 
 - The league's permanent store has been tested against a real SQL engine speaking Cloudflare D1's interface, not against Cloudflare.
 - Nothing about cost. The order-book record starts in October 2026.
 - No live call existed when this was written. The forward test starts at zero.
+- The host's hourly clock was added on launch day, after GitHub's scheduler failed to start any run. It is tested against a stand-in for GitHub's API; check the commit history for hourly agent commits to see it working.
 
 ## Run it
 
@@ -315,6 +321,7 @@ Both skip the build when a commit only changes data, so the hourly agent does no
 | Where | Name | What it switches on |
 | --- | --- | --- |
 | GitHub repository secrets | `LLM_BASE_URL`, `LLM_API_KEY`, `LLM_MODEL`, `LLM_LABEL` | The language-model player (any OpenAI-compatible endpoint). `LLM_LABEL` is the name shown on the table |
+| Host environment | `GITHUB_DISPATCH_TOKEN` | The hourly clock: the host starts the agent's workflow three minutes after every hour. A fine-grained GitHub token for this repository with Actions read and write. Without it the agent depends on GitHub's own scheduler |
 | Host environment | `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_D1_DATABASE_ID`, `CLOUDFLARE_API_TOKEN` | A permanent league. Without them the league is kept in memory and says so |
 | Host environment | `LLM_BASE_URL`, `LLM_API_KEY`, `LLM_MODEL` | Rewording in Ask |
 
@@ -351,7 +358,7 @@ Tools: `bellwether_tonight`, `bellwether_ask`, `bellwether_join`, `bellwether_ca
 | --- | --- |
 | `src/core/` | The engine: calendar, market view, rules, the house's loop, the ledger, the study's arithmetic, cost, league, model player, Ask, the Bitget client |
 | `src/ui/` | The React app |
-| `api/`, `netlify/` | Server routes and the Netlify adapter |
+| `api/`, `netlify/` | Server routes, the Netlify adapter and the hourly clock |
 | `mcp/`, `skills/` | The MCP tool server and the Agent Hub skill file |
 | `scripts/` | The recorders, the hourly agent, the build and the local server |
 | `research/` | The pre-registration, the study runner, the Python audit, results, every call as CSV, the rolling and forward tests |
@@ -369,7 +376,10 @@ A line-by-line account of every part is in [docs/TECHNICAL.md](docs/TECHNICAL.md
 Because the null is the useful answer. The person staring at a 3% move at 04:00 believes they must do something fast. The record says that, on average, they do not, and it says how wide the uncertainty on that is. A product that reported an edge this data does not contain would be worth less.
 
 **If the house only knows the base rate, what is the agent for?**
-It is the benchmark that cannot cheat. Its calls are sealed before outcomes, so every person and every model can be measured against the same fixed standard. Beating it over many live rounds would mean something. So far its score is 1.51 points a call, barely above saying 50% every time, and the page says so.
+It is the benchmark that cannot cheat. Its calls are sealed before outcomes, so every person and every model can be measured against the same fixed standard. That standard is the base rate: the house does not beat a plain running base rate, and the study says so. Beating the house over many live rounds would therefore mean you know something the base rate does not.
+
+**Two moves in three hold. Is beating 50% not trivial?**
+Yes. A reader pointed this out on launch day and was right. On the held-or-faded question the house says "holds" every time, because it never forecast below 54.6%, so it is right 63.3% of the time, the same as always saying holds. Scored as a probability it earns 1.51 points a call against 1.59 for a plain running base rate. The comparison is now in the study, marked as added after publication.
 
 **Could the forecasts have been written after the fact?**
 For the replayed history, the proof is the no-look-ahead tests and the second implementation. For live calls, the proof is the commit history: the call is published in one commit and the outcome in a later one, hours apart. The two are never mixed in one figure.
@@ -391,9 +401,9 @@ No. It is a record and a game. It measures what happened; it does not say what t
 - A null result with a margin of about 19 basis points, on about twelve months of data.
 - The perp's own hourly prices only. Nothing about the shares, the open itself, or cost.
 - These contracts did not trade at weekends before February 2026.
-- The house is a base-rate table. It cannot tell a strong night from a weak one.
+- The house is a base-rate table. It cannot tell a strong night from a weak one and does not beat a plain running base rate.
 - The league cannot stop one person registering several handles.
-- GitHub's scheduler can start a run late. A call first seen after its outcome is counted as replay, never as live.
+- GitHub's own scheduler did not start the hourly runs on launch day, so a scheduled function on the host starts them (see [`netlify/tick.ts`](netlify/tick.ts)). If a run is late, a call first seen after its outcome is counted as replay, never as live.
 - The market calendar ends in 2027.
 
 ## Licence

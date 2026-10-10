@@ -83,7 +83,7 @@ export async function run(opts: { now?: number; data?: string; live?: string; re
     events: after.length, windows: new Set(after.map((r) => r.window)).size,
     claim1: claim1(after, state.quiet.filter((q) => q.gradeAt > TEST_END)), claim2: claim2(after), claim3: claim3(after),
     months: byMonth(allRows),
-    fixed: results && { events: results.sets.test.events, windows: results.sets.test.windows, claim1: results.claim1, claim2: results.claim2, claim3: results.claim3, breakdowns: results.breakdowns, breakdownCount: results.breakdownCount },
+    fixed: results && { events: results.sets.test.events, windows: results.sets.test.windows, claim1: results.claim1, claim2: results.claim2, claim3: results.claim3, breakdowns: results.breakdowns, breakdownCount: results.breakdownCount, baseRate: results.posthoc?.baseRate ?? null },
   };
 
   const out = (name: string, data: unknown) => writeIfChanged(path.join(dir, name), JSON.stringify(data) + '\n');

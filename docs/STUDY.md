@@ -5,7 +5,7 @@
 **Answer, in three lines.**
 
 1. **No measurable average difference.** After a move is called, the perp's price 90 minutes after the open is on average -3.9 basis points further in the move's direction, with a 95% interval of -23.4 to +15.5. That interval contains zero. This data cannot rule out an average of about 19 basis points either way.
-2. **About two moves in three hold, and the house's range is calibrated on average.** 63.6% of moves still had at least half their size standing. The house's 80% price range contained the outcome 78.2% of the time (interval 74.8% to 81.6%, which includes 80%). It under-covered for large moves.
+2. **About two moves in three hold, and the house's range is calibrated on average.** 63.6% of moves still had at least half their size standing. The house's 80% price range contained the outcome 78.2% of the time (interval 74.8% to 81.6%, which includes 80%). It under-covered for large moves. Its hold forecast does not beat a plain running base rate.
 3. **The order rule had nothing to act on.** It departed from "half now, half later" on only 15 of 1,143 moves, so its result (0.0 basis points against half and half) says only that the record gave it no reason to deviate. It is not evidence that timing cannot add value.
 
 In plain words: in this data, nothing favours rushing to act on an off-hours move and nothing favours waiting for it to reverse. The study measured prices only. It did not measure what trading costs at each hour, which is the other half of that decision. An hourly order-book recorder was added in October 2026 for that purpose.
@@ -22,11 +22,12 @@ No figure in this document is typed by hand: `research/report.ts` writes it from
 6. [Every breakdown](#every-breakdown)
 7. [Month by month](#month-by-month)
 8. [Found in review: weekend halts, and other splits](#found-in-review-weekend-halts-and-other-splits)
-9. [What the study did not show](#what-the-study-did-not-show)
-10. [Checks on the study itself](#checks-on-the-study-itself)
-11. [The independent review](#the-independent-review)
-12. [After the fixed test: rolling and forward](#after-the-fixed-test-rolling-and-forward)
-13. [Reproduce it](#reproduce-it)
+9. [Raised after publication: the house against the base rate](#raised-after-publication-the-house-against-the-base-rate)
+10. [What the study did not show](#what-the-study-did-not-show)
+11. [Checks on the study itself](#checks-on-the-study-itself)
+12. [The independent review](#the-independent-review)
+13. [After the fixed test: rolling and forward](#after-the-fixed-test-rolling-and-forward)
+14. [Reproduce it](#reproduce-it)
 
 ## Data
 
@@ -98,7 +99,7 @@ By the rule fixed in advance the range is **calibrated on average over the test 
 | under 1 x scale | 1,069 | 78.9% (75.5% to 82.2%) |
 | 1 x scale or more | 74 | 68.9% (54.1% to 81.4%) |
 
-The hold forecast beats always saying 50%: the interval of its points is wholly above zero. That is a low bar, and it clears it by knowing the base rate. It does not tell a strong night from a weak one:
+The hold forecast beats always saying 50%: the interval of its points is wholly above zero. That is the wrong bar. About two moves in three hold, so 50% is easy to beat, and against the base rate the house shows nothing (see [the section added after publication](#raised-after-publication-the-house-against-the-base-rate)). It does not tell a strong night from a weak one:
 
 | House said it holds | Moves | Average forecast | Actually held |
 | --- | ---: | ---: | ---: |
@@ -206,10 +207,30 @@ Nothing in this section was fixed in advance. It was added after an independent 
 - 122 calls were made on an hourly bar with under 10,000 USDT traded, and 24 on one with under 1,000. Prices on bars that thin are last trades on a thin book.
 - The house's forecaster treats weekend sessions before and after the change as one class. Since the change, weekend moves have a mean of Y of -45.2 basis points with an interval of -94.3 to +5.5. That interval contains zero. It is the cut most worth watching as the rolling test grows.
 
+## Raised after publication: the house against the base rate
+
+This section was added on 10 October 2026, hours after publication, because a reader of the launch post made a correct objection: 63.6% of moves held, so anyone who always says "holds" is already right about two times in three, and beating 50% proves nothing. The comparison fixed in advance was against 50%. The comparison that matters is against the base rate. It was not fixed in advance, and here it is.
+
+The running base rate for a session is the share of all moves in earlier sessions that held. It uses nothing the house could not have known, and it knows nothing about the night in question: one number for every move.
+
+| On the 1,143 test-set moves the house forecast | The house | The plain base rate |
+| --- | ---: | ---: |
+| Right on held or faded | 63.3% | 63.3% (always saying "holds") |
+| Points a call | 1.51 (0.50 to 2.50) | 1.59 (0.55 to 2.62) (running base rate) |
+| Brier score, lower is better | 0.2349 | 0.2341 (running base rate) |
+
+- **The house never forecast below 54.6%.** Its forecasts ran from 54.6% to 76.1%, so on the held-or-faded question it said "holds" on all 1,143 moves. Its hit rate is the hit rate of always saying holds.
+- **It does not beat the running base rate.** The house's points minus the base rate's: -0.08 a call, with an interval of -0.40 to +0.23. That interval contains zero: the two cannot be told apart.
+- For scale: one constant equal to the hold rate over the whole test set, which nobody could have known in advance, has a Brier score of 0.2322.
+
+Plainly: sorting nights by kind and by size of move, which is all the house does beyond counting, added nothing measurable to the hold forecast. The house is the base rate, sealed before the outcome. That is what it is for: it is the bar a person, a model or an outside agent has to clear, and clearing 50% is not clearing it.
+
+The 63.3% here is the hold rate on the 1,143 moves that had a forecast. The 63.6% in Result 1 is over all 1,175.
+
 ## What the study did not show
 
 - **No timing edge was detected.** The headline is a null result with a margin of about 19 basis points. Nothing here supports selling at once after an off-hours fall, or waiting for a rebound. Nothing here proves there is no edge either.
-- **No skill at telling nights apart.** The house knows the base rate and little more. Its higher hold forecasts did not hold more often.
+- **No skill at telling nights apart.** The house knows the base rate and nothing more. Its higher hold forecasts did not hold more often, and it does not beat a plain running base rate (-0.08 points a call, interval -0.40 to +0.23).
 - **Nothing about profit.** No strategy was tested for profit and none is claimed. Points measure forecast quality, not money.
 - **Nothing about cost.** Candles hold no spread and no depth, and funding payments between the call and the outcome are ignored. Every figure is at hourly last-trade prices. An hourly order-book recorder was added only in October 2026. Any statement that cost is what matters is a reasonable guess, not a finding of this study.
 - **Nothing about the stock.** The price at the close, the price at the call and the outcome are all the perp's own prints. Nothing was checked against the shares' pre-market or opening prices, or against the perp's index.

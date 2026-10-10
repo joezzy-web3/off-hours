@@ -41,7 +41,7 @@ export function House() {
         <div className="glass"><h2>Calls graded</h2><b>{s.graded.toLocaleString('en-US')}</b><p>across {s.windows} closed sessions and {s.contracts.length} contracts</p></div>
         <div className="glass"><h2>Inside its range</h2><b>{pc(s.house.coverage)}</b><p>of prices landed in the range it called 80%</p></div>
         <div className="glass"><h2>Moves that held</h2><b>{pc(s.house.held)}</b><p>still had half the move standing after the bell</p></div>
-        <div className="glass"><h2>Points a call</h2><b>{signed(s.house.points, 2)}</b><p>where saying 50% every time scores 0</p></div>
+        <div className="glass"><h2>Points a call</h2><b>{signed(s.house.points, 2)}</b><p>50% every time scores 0. The plain base rate scores about the same as the house</p></div>
       </section>
       <p className="note">Every night on record since {nyDay(s.from)} {year(s.from)}. {s.live.boards + s.live.open > 0 ? `${s.live.boards} of these calls were made live by the scheduled agent, before their outcome existed, and ${s.live.open} more are waiting for a bell.` : 'The scheduled agent has not yet had a live call graded; everything so far is a replay of recorded history.'} Replayed and live calls are kept in separate records.</p>
 
@@ -65,7 +65,7 @@ export function House() {
             </tbody>
           </table>
         </div>
-        <p className="note">The bar is how often the move held and the white mark is what the house forecast. Read it plainly: the house knows the base rate, which is why it beats 50%, but its higher forecasts did not hold more often than its lower ones. It cannot tell a strong night from a weak one.</p>
+        <p className="note">The bar is how often the move held and the white mark is what the house forecast. Read it plainly: about two moves in three hold, so beating 50% is easy and proves nothing. The house knows the base rate and nothing more: its higher forecasts did not hold more often than its lower ones, and it cannot tell a strong night from a weak one. The base rate is the bar to beat.</p>
       </section>
 
       <section aria-labelledby="running">
@@ -128,7 +128,7 @@ function Study({ study }: { study: StudyFile }) {
       <p className="body">Three claims were written down before the test data was read. The fixed test covers every contract from its first bar to 28 August 2026 and is never re-run. The rolling test applies the same code to everything recorded since, and a scheduled job extends it every hour.</p>
       <div className="verdicts">
         <div className="glass"><i>1</i><h3>{verdict1}</h3><p>The margin includes zero, so no difference between acting at once and waiting was detected. An average of about {margin} basis points either way cannot be ruled out.</p></div>
-        <div className="glass"><i>2</i><h3>{verdict2}</h3><p>{pc(f.claim2.coverage.mean)} of prices landed inside it, and the margin includes 80%. It under-covered on large moves, and it beats 50% only by knowing the base rate.</p></div>
+        <div className="glass"><i>2</i><h3>{verdict2}</h3><p>{pc(f.claim2.coverage.mean)} of prices landed inside it, and the margin includes 80%. It under-covered on large moves. {f.baseRate ? `Its hold forecast does not beat a plain running base rate: ${f.baseRate.housePoints.mean.toFixed(2)} points a call against ${f.baseRate.runningPoints.mean.toFixed(2)}, and the margin on the difference includes zero.` : 'Its hold forecast beats 50% only by knowing the base rate.'}</p></div>
         <div className="glass"><i>3</i><h3>{verdict3}</h3><p>It chose half and half on {f.claim3.plans.split.toLocaleString('en-US')} of {f.claim3.events.toLocaleString('en-US')} nights. That says the record gave it no reason to deviate, not that timing can never add value.</p></div>
       </div>
       <div className="scroll">

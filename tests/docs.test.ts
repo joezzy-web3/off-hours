@@ -12,7 +12,7 @@ const bp = (x: number) => { const v = (x * 1e4).toFixed(1); return v === '-0.0' 
 const pc = (x: number) => `${(x * 100).toFixed(1)}%`;
 
 test('The figures quoted in the README are the ones in research/results.json', () => {
-  const c1 = r.claim1, c2 = r.claim2, c3 = r.claim3, since = r.posthoc.periods[1];
+  const c1 = r.claim1, c2 = r.claim2, c3 = r.claim3, since = r.posthoc.periods[1], br = r.posthoc.baseRate;
   const expected: Record<string, string> = {
     'moves and sessions': `${n(r.sets.test.events)} moves in ${n(r.sets.test.windows)} closed sessions`,
     'mean move after the call': `**${bp(c1.y.mean)} bp** | ${bp(c1.y.lo)} to ${bp(c1.y.hi)}`,
@@ -31,6 +31,11 @@ test('The figures quoted in the README are the ones in research/results.json', (
     'breakdowns': `all ${r.breakdownCount} breakdowns`,
     'resamples': `${n(r.resamples)} resamples`,
     'contracts': r.data.contracts.join(', ').replace(/, ([A-Z]+)$/, ' and $1'),
+    'the house against the base rate': `**${br.difference.mean.toFixed(2)} points** | ${br.difference.lo.toFixed(2)} to +${br.difference.hi.toFixed(2)}`,
+    'the house and always saying holds': `right ${pc(br.houseHit)} of the time`,
+    'points of the house and of the base rate': `${c2.points.mean.toFixed(2)} points a call against ${br.runningPoints.mean.toFixed(2)} for a plain running base rate`,
+    'the lowest forecast the house made': `never forecast below ${pc(br.lowestForecast)}`,
   };
+  assert.equal(br.houseHit, br.alwaysHoldsHit, 'the README says the house is right exactly as often as always saying holds');
   for (const [what, text] of Object.entries(expected)) assert.ok(readme.includes(text), `README is out of step with the study on ${what}: expected to find "${text}"`);
 });

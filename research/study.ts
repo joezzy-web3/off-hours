@@ -12,7 +12,7 @@ import { span } from '../src/core/market';
 import { MIN_PRIOR, THRESHOLD } from '../src/core/rules';
 import { HOUR } from '../src/core/calendar';
 import { stdev } from '../src/core/rules';
-import { B, byMonth, claim1, claim2, claim3, clustered, Row, rows, SEED, TEST_END } from '../src/core/study';
+import { B, baseRate, byMonth, claim1, claim2, claim3, clustered, Row, rows, SEED, TEST_END } from '../src/core/study';
 
 // ---- the run ---------------------------------------------------------------------
 
@@ -84,6 +84,8 @@ function main() {
     afterHalt: { events: test.filter((r) => r.afterHalt).length, weekend: test.filter((r) => r.afterHalt && r.kind === 'weekend').length },
     thin: { under10k: test.filter((r) => r.volume !== null && r.volume < 10_000).length, under1k: test.filter((r) => r.volume !== null && r.volume < 1_000).length },
     size: { meanMoveBp: test.reduce((a, r) => a + Math.abs(r.m), 0) / test.length, meanOfScale: test.reduce((a, r) => a + Math.abs(r.m) / r.s, 0) / test.length, shareAtLeastOneScale: test.filter((r) => Math.abs(r.m) >= r.s).length / test.length, sdOfY: stdev(test.map(y)) },
+    // added after publication, at a reader's prompting: the hold forecast against the plain base rate
+    baseRate: baseRate(test),
     hoursOfHistory: Math.round((last - first) / HOUR),
     firstBars: Object.fromEntries(symbols.map((s) => [s.replace('USDT', ''), Math.min(...market[s].keys())])),
   };

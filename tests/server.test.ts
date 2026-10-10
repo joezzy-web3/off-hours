@@ -4,6 +4,7 @@ import { createServer, Server } from 'node:http';
 import test, { after, before } from 'node:test';
 import { DatabaseSync } from 'node:sqlite';
 import { handler, NetlifyEvent } from '../netlify/api';
+import { handler as tick } from '../netlify/tick';
 import { Feed } from '../src/core/league';
 import { D1Store } from '../src/core/store';
 import { MOCK_SECRET, startMock } from './mock-bitget';
@@ -53,11 +54,27 @@ const api = async (method: string, route: string, data?: unknown) => {
   return { status: out.statusCode, json: JSON.parse(out.body) };
 };
 
-test('status says what is switched on and leaks no secret', async () => {
+test('status says what is switched on and leaks no secret; the clock starts the workflows only with a token', async () => {
   const { status, json } = await api('GET', 'status');
   assert.equal(status, 200);
   assert.deepEqual(json, { league: 'd1', model: false, orders: 'demo only', feed: feedUrl });
   assert.equal((await api('GET', 'nothing')).status, 404);
+
+  // the clock: starts the order-book recorder and then the agent, and only when it holds a token
+  const seen: { url: string; auth: string; body: string }[] = [];
+  const github = createServer(async (req, res) => { seen.push({ url: `${req.method} ${req.url}`, auth: String(req.headers.authorization), body: await body(req) }); res.statusCode = 204; res.end(); });
+  process.env.GITHUB_API_URL = await listen(github);
+  try {
+    delete process.env.GITHUB_DISPATCH_TOKEN;
+    assert.match((await tick()).body, /nothing started/);
+    assert.equal(seen.length, 0);
+    process.env.GITHUB_DISPATCH_TOKEN = 'clock-token';
+    const out = await tick();
+    assert.equal(out.body, 'record-book.yml: started; agent.yml: started');
+    assert.ok(!out.body.includes('clock-token'));
+    assert.deepEqual(seen.map((r) => r.url), ['POST /repos/joezzy-web3/off-hours/actions/workflows/record-book.yml/dispatches', 'POST /repos/joezzy-web3/off-hours/actions/workflows/agent.yml/dispatches']);
+    assert.ok(seen.every((r) => r.auth === 'Bearer clock-token' && JSON.parse(r.body).ref === 'main'));
+  } finally { delete process.env.GITHUB_DISPATCH_TOKEN; delete process.env.GITHUB_API_URL; github.close(); }
 });
 
 test('league over D1: join, call before the bell, first call stands, table is graded by the published outcomes', async () => {

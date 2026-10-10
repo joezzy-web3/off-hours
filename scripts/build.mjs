@@ -1,6 +1,6 @@
 // Build with esbuild only, so the toolchain stays small:
 //   node scripts/build.mjs             web app -> dist/web, plus one self-contained page in dist/preview
-//   node scripts/build.mjs --netlify   web app + one Netlify function -> dist/netlify/functions/api.js
+//   node scripts/build.mjs --netlify   web app + the Netlify functions -> dist/netlify/functions/api.js, tick.js
 //   node scripts/build.mjs --mcp       agent tool server -> dist/mcp/bellwether.mjs
 import { build } from 'esbuild';
 import { cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
@@ -66,7 +66,9 @@ ${js.replace(/<\/script/gi, '<\\/script')}
 async function netlify() {
   await rm('dist/netlify', { recursive: true, force: true });
   await build({ entryPoints: ['netlify/api.ts'], outfile: 'dist/netlify/functions/api.js', bundle: true, platform: 'node', format: 'cjs', target: 'node18', logLevel: 'warning' });
-  console.log('netlify: dist/netlify/functions/api.js');
+  // the hourly clock: a scheduled function that starts the agent's workflow (see netlify.toml)
+  await build({ entryPoints: ['netlify/tick.ts'], outfile: 'dist/netlify/functions/tick.js', bundle: true, platform: 'node', format: 'cjs', target: 'node18', logLevel: 'warning' });
+  console.log('netlify: dist/netlify/functions/api.js, tick.js');
 }
 
 async function mcp() {

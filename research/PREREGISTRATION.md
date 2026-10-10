@@ -169,6 +169,11 @@ nothing earlier.
   was added to the study and is labelled there as not fixed in advance. (3) A reading of this
   document that it leaves open: sessions that close early are left out as closed windows, but
   their 13:00 close is still used as that day's close in the scale.
+- 10 October 2026, after publication: a reader of the launch post pointed out that 50% is the
+  wrong bar for the hold forecast, because about two moves in three hold. This document fixed
+  the comparison against a constant 50% and no other. A comparison against a running base
+  rate (the share of all moves in earlier sessions that held) was added to docs/STUDY.md and
+  is labelled there as not fixed in advance. No rule, threshold or figure fixed here changed.
 - Not a change, but stated for completeness: a required bar that is missing causes that hour
   to be skipped, not counted separately. The recorded history has no missing hours, so this
   never happened.

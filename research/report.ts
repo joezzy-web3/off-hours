@@ -26,6 +26,7 @@ const missing = r.data.contracts.reduce((a: number, c: string) => a + (manifest.
 const halted = Object.entries(p.halts as Record<string, { zeroVolumeBars: number; longHalts: number }>);
 const active = c3.plans.now + c3.plans.bell;
 const [before, since] = p.periods;
+const br = p.baseRate;
 const stamp = (t: number) => `${new Date(t).toISOString().slice(0, 16).replace('T', ' ')} UTC`;
 
 const doc = `# The study
@@ -35,7 +36,7 @@ const doc = `# The study
 **Answer, in three lines.**
 
 1. **No measurable average difference.** After a move is called, the perp's price 90 minutes after the open is on average ${bp(c1.y.mean)} basis points further in the move's direction, with a 95% interval of ${bp(c1.y.lo)} to ${bp(c1.y.hi)}. That interval contains zero. This data cannot rule out an average of about ${halfWidth} basis points either way.
-2. **About two moves in three hold, and the house's range is calibrated on average.** ${pc(c1.held.mean)} of moves still had at least half their size standing. The house's 80% price range contained the outcome ${pc(c2.coverage.mean)} of the time (interval ${pc(c2.coverage.lo)} to ${pc(c2.coverage.hi)}, which ${calibrated ? 'includes' : 'does not include'} 80%). It under-covered for large moves.
+2. **About two moves in three hold, and the house's range is calibrated on average.** ${pc(c1.held.mean)} of moves still had at least half their size standing. The house's 80% price range contained the outcome ${pc(c2.coverage.mean)} of the time (interval ${pc(c2.coverage.lo)} to ${pc(c2.coverage.hi)}, which ${calibrated ? 'includes' : 'does not include'} 80%). It under-covered for large moves. Its hold forecast does not beat a plain running base rate.
 3. **The order rule had nothing to act on.** It departed from "half now, half later" on only ${active} of ${n(c3.events)} moves, so its result (${bp(c3.vsSplit.mean)} basis points against half and half) says only that the record gave it no reason to deviate. It is not evidence that timing cannot add value.
 
 In plain words: in this data, nothing favours rushing to act on an off-hours move and nothing favours waiting for it to reverse. The study measured prices only. It did not measure what trading costs at each hour, which is the other half of that decision. An hourly order-book recorder was added in October 2026 for that purpose.
@@ -52,11 +53,12 @@ No figure in this document is typed by hand: \`research/report.ts\` writes it fr
 6. [Every breakdown](#every-breakdown)
 7. [Month by month](#month-by-month)
 8. [Found in review: weekend halts, and other splits](#found-in-review-weekend-halts-and-other-splits)
-9. [What the study did not show](#what-the-study-did-not-show)
-10. [Checks on the study itself](#checks-on-the-study-itself)
-11. [The independent review](#the-independent-review)
-12. [After the fixed test: rolling and forward](#after-the-fixed-test-rolling-and-forward)
-13. [Reproduce it](#reproduce-it)
+9. [Raised after publication: the house against the base rate](#raised-after-publication-the-house-against-the-base-rate)
+10. [What the study did not show](#what-the-study-did-not-show)
+11. [Checks on the study itself](#checks-on-the-study-itself)
+12. [The independent review](#the-independent-review)
+13. [After the fixed test: rolling and forward](#after-the-fixed-test-rolling-and-forward)
+14. [Reproduce it](#reproduce-it)
 
 ## Data
 
@@ -127,7 +129,7 @@ By the rule fixed in advance the range is ${calibrated ? '**calibrated on averag
 | --- | ---: | ---: |
 ${p.coverageBySize.map((x: Iv & { size: string }) => `| ${x.size === 'small' ? 'under 1 x scale' : '1 x scale or more'} | ${n(x.n)} | ${ivPc(x)} |`).join('\n')}
 
-The hold forecast beats always saying 50%: the interval of its points is wholly above zero. That is a low bar, and it clears it by knowing the base rate. It does not tell a strong night from a weak one:
+The hold forecast beats always saying 50%: the interval of its points is wholly above zero. That is the wrong bar. About two moves in three hold, so 50% is easy to beat, and against the base rate the house shows nothing (see [the section added after publication](#raised-after-publication-the-house-against-the-base-rate)). It does not tell a strong night from a weak one:
 
 | House said it holds | Moves | Average forecast | Actually held |
 | --- | ---: | ---: | ---: |
@@ -196,10 +198,30 @@ Nothing in this section was fixed in advance. It was added after an independent 
 - ${n(p.thin.under10k)} calls were made on an hourly bar with under 10,000 USDT traded, and ${n(p.thin.under1k)} on one with under 1,000. Prices on bars that thin are last trades on a thin book.
 - The house's forecaster treats weekend sessions before and after the change as one class. Since the change, weekend moves have a mean of Y of ${bp(since.weekend.y.mean)} basis points with an interval of ${bp(since.weekend.y.lo)} to ${bp(since.weekend.y.hi)}. That interval contains zero. It is the cut most worth watching as the rolling test grows.
 
+## Raised after publication: the house against the base rate
+
+This section was added on 10 October 2026, hours after publication, because a reader of the launch post made a correct objection: ${pc(c1.held.mean)} of moves held, so anyone who always says "holds" is already right about two times in three, and beating 50% proves nothing. The comparison fixed in advance was against 50%. The comparison that matters is against the base rate. It was not fixed in advance, and here it is.
+
+The running base rate for a session is the share of all moves in earlier sessions that held. It uses nothing the house could not have known, and it knows nothing about the night in question: one number for every move.
+
+| On the ${n(br.events)} test-set moves the house forecast | The house | The plain base rate |
+| --- | ---: | ---: |
+| Right on held or faded | ${pc(br.houseHit)} | ${pc(br.alwaysHoldsHit)} (always saying "holds") |
+| Points a call | ${ivN(br.housePoints)} | ${ivN(br.runningPoints)} (running base rate) |
+| Brier score, lower is better | ${br.houseBrier.toFixed(4)} | ${br.runningBrier.toFixed(4)} (running base rate) |
+
+- **The house never forecast below ${pc(br.lowestForecast)}.** Its forecasts ran from ${pc(br.lowestForecast)} to ${pc(br.highestForecast)}, so on the held-or-faded question it said "holds" on ${br.saidHolds === br.events ? `all ${n(br.events)}` : `${n(br.saidHolds)} of ${n(br.events)}`} moves. Its hit rate is the hit rate of always saying holds.
+- **It does not beat the running base rate.** The house's points minus the base rate's: ${br.difference.mean.toFixed(2)} a call, with an interval of ${br.difference.lo.toFixed(2)} to ${br.difference.hi >= 0 ? '+' : ''}${br.difference.hi.toFixed(2)}. ${br.difference.lo <= 0 && br.difference.hi >= 0 ? 'That interval contains zero: the two cannot be told apart.' : br.difference.hi < 0 ? 'That interval is wholly below zero: the house is worse.' : 'That interval is wholly above zero: the house is better.'}
+- For scale: one constant equal to the hold rate over the whole test set, which nobody could have known in advance, has a Brier score of ${br.hindsightBrier.toFixed(4)}.
+
+Plainly: sorting nights by kind and by size of move, which is all the house does beyond counting, added nothing measurable to the hold forecast. The house is the base rate, sealed before the outcome. That is what it is for: it is the bar a person, a model or an outside agent has to clear, and clearing 50% is not clearing it.
+
+The ${pc(br.alwaysHoldsHit)} here is the hold rate on the ${n(br.events)} moves that had a forecast. The ${pc(c1.held.mean)} in Result 1 is over all ${n(t.events)}.
+
 ## What the study did not show
 
 - **No timing edge was detected.** The headline is a null result with a margin of about ${halfWidth} basis points. Nothing here supports selling at once after an off-hours fall, or waiting for a rebound. Nothing here proves there is no edge either.
-- **No skill at telling nights apart.** The house knows the base rate and little more. Its higher hold forecasts did not hold more often.
+- **No skill at telling nights apart.** The house knows the base rate and nothing more. Its higher hold forecasts did not hold more often, and it does not beat a plain running base rate (${br.difference.mean.toFixed(2)} points a call, interval ${br.difference.lo.toFixed(2)} to ${br.difference.hi >= 0 ? '+' : ''}${br.difference.hi.toFixed(2)}).
 - **Nothing about profit.** No strategy was tested for profit and none is claimed. Points measure forecast quality, not money.
 - **Nothing about cost.** Candles hold no spread and no depth, and funding payments between the call and the outcome are ignored. Every figure is at hourly last-trade prices. An hourly order-book recorder was added only in October 2026. Any statement that cost is what matters is a reasonable guess, not a finding of this study.
 - **Nothing about the stock.** The price at the close, the price at the call and the outcome are all the perp's own prints. Nothing was checked against the shares' pre-market or opening prices, or against the perp's index.

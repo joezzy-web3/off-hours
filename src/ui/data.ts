@@ -20,7 +20,7 @@ export interface Claims {
 }
 export interface StudyFile extends Claims {
   updatedAt: number; from: number; through: number; events: number; windows: number; months: MonthRow[];
-  fixed: (Claims & { events: number; windows: number; breakdowns: { group: string; name: string; plain: Iv; adjusted: Iv; extended: number }[]; breakdownCount: number }) | null;
+  fixed: (Claims & { events: number; windows: number; breakdowns: { group: string; name: string; plain: Iv; adjusted: Iv; extended: number }[]; breakdownCount: number; baseRate?: { events: number; lowestForecast: number; houseHit: number; alwaysHoldsHit: number; housePoints: Iv; runningPoints: Iv; difference: Iv } | null }) | null;
 }
 export interface Full extends Summary { model: { name: string | null; calls: number; graded: number; points: number; pending: number }; study: (Study & { testEnd: number }) | null }
 
