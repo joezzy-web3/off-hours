@@ -43,24 +43,39 @@ export type Chat = (system: string, user: string) => Promise<string | null>;
  */
 export const modelName = (env: NodeJS.ProcessEnv = process.env) => (env.LLM_BASE_URL && env.LLM_API_KEY && env.LLM_MODEL ? env.LLM_LABEL || 'language model' : null);
 
-/** One call to any OpenAI-compatible chat endpoint. Null when no model is configured. */
+/** Why the last call to the model gave no text: a status code or a finish reason, never a secret. */
+export let lastChatNote = '';
+
+/**
+ * One call to any OpenAI-compatible chat endpoint. Null when no model is configured.
+ * The token limit is generous on purpose: some models spend output tokens on hidden
+ * reasoning before they write, and a tight limit leaves them with no room to answer.
+ */
 export const chat: Chat = async (system, user) => {
   const { LLM_BASE_URL: base, LLM_API_KEY: key, LLM_MODEL: model } = process.env;
   if (!base || !key || !model) return null;
   const r = await fetch(base.replace(/\/$/, '') + '/chat/completions', {
     method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${key}` },
-    body: JSON.stringify({ model, temperature: 0.2, max_tokens: 200, messages: [{ role: 'system', content: system }, { role: 'user', content: user }] }),
+    body: JSON.stringify({ model, temperature: 0.2, max_tokens: 4096, messages: [{ role: 'system', content: system }, { role: 'user', content: user }] }),
     signal: AbortSignal.timeout(30_000),
   });
-  const json = (await r.json()) as { choices?: { message?: { content?: string } }[] };
-  return json.choices?.[0]?.message?.content ?? null;
+  if (!r.ok) { lastChatNote = `the endpoint answered ${r.status}`; return null; }
+  const json = (await r.json()) as { choices?: { message?: { content?: string }; finish_reason?: string }[] };
+  const text = json.choices?.[0]?.message?.content ?? null;
+  lastChatNote = text ? '' : `no text in the answer (finish reason: ${json.choices?.[0]?.finish_reason ?? 'none given'})`;
+  return text;
 };
 
 /** Ask once, and once more if the first answer cannot be read. */
 export async function ask(b: OpenBoard, now: number, via: Chat = chat): Promise<Answer | null> {
   const { system, user } = prompt(b, now);
   for (let i = 0; i < 2; i++) {
-    try { const a = parseAnswer(await via(system, user)); if (a) return a; } catch { /* try again, then sit out */ }
+    try {
+      const text = await via(system, user);
+      const a = parseAnswer(text);
+      if (a) return a;
+      if (text) lastChatNote = 'the answer was not the one line of JSON asked for';
+    } catch (e) { lastChatNote = `the call failed (${(e as Error).name})`; /* try again, then sit out */ }
   }
   return null;
 }

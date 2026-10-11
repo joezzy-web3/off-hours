@@ -18,7 +18,7 @@ import { loadMarket, readJson, writeIfChanged } from '../src/core/files';
 import { append, Entry, firstBreak } from '../src/core/ledger';
 import { buildLive, markSeen, Seen } from '../src/core/live';
 import { span } from '../src/core/market';
-import { ask, Chat, chat, modelName } from '../src/core/model';
+import { lastChatNote, ask, Chat, chat, modelName } from '../src/core/model';
 import { MIN_PRIOR, points, THRESHOLD, timing } from '../src/core/rules';
 import { byMonth, claim1, claim2, claim3, rows as studyRows, TEST_END } from '../src/core/study';
 
@@ -49,6 +49,7 @@ export async function run(opts: { now?: number; data?: string; live?: string; re
       if (now >= call.bell || chain.some((e) => (e.body as ModelBody).id === call.id)) continue;
       const answer = await ask(call, now, opts.via ?? chat);
       if (answer) append(chain, now, 'call', { id: call.id, model: name, p: answer.p, reason: answer.reason } satisfies ModelBody);
+      else console.log(`model player: no call on ${call.id} this hour: ${lastChatNote || 'no answer'}. It is asked again next hour, until the bell.`);
     }
   }
   if (firstBreak(chain) !== -1) throw new Error('the model player\'s record does not verify');
