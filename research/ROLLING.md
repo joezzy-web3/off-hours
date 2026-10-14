@@ -4,7 +4,7 @@ The fixed test in docs/STUDY.md covers each contract's first bar up to the New Y
 is never re-run on new data. This file applies the same three claims, with the same code and nothing changed, to
 everything recorded after that date. A scheduled job rewrites it every hour, so it keeps growing.
 
-Updated 2026-10-14 10:03 UTC. 157 moves in 30 closed sessions since the fixed test ended.
+Updated 2026-10-14 10:09 UTC. 157 moves in 30 closed sessions since the fixed test ended.
 The first six weeks of this period (to 8 October 2026) were looked at before the rules were fixed; see research/PREREGISTRATION.md.
 
 | | Since the fixed test | Fixed test |
