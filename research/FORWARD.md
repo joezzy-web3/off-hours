@@ -5,7 +5,7 @@ happened next. Every hour a scheduled job appends the new Bitget candles, replay
 changed, and counts here only the calls it published before their outcome existed. Nothing is tuned on
 what this finds. It only keeps score.
 
-Updated 2026-10-31 02:03 UTC. Candles on file through 2026-10-31 02:00 UTC.
+Updated 2026-10-31 03:03 UTC. Candles on file through 2026-10-31 03:00 UTC.
 
 | | Live calls | Test set (study) |
 | --- | ---: | ---: |
