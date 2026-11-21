@@ -5,12 +5,12 @@ happened next. Every hour a scheduled job appends the new Bitget candles, replay
 changed, and counts here only the calls it published before their outcome existed. Nothing is tuned on
 what this finds. It only keeps score.
 
-Updated 2026-11-20 23:03 UTC. Candles on file through 2026-11-20 23:00 UTC.
+Updated 2026-11-21 00:03 UTC. Candles on file through 2026-11-21 00:00 UTC.
 
 | | Live calls | Test set (study) |
 | --- | ---: | ---: |
 | Calls graded | 210 | 1,175 |
-| Calls waiting for a bell | 1 | |
+| Calls waiting for a bell | 3 | |
 | Moves that held | 56.7% | 63.6% |
 | Prices inside the 80% range | 73.8% | 78.2% |
 | Points a call | -0.32 | 1.51 |
