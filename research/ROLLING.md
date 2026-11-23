@@ -4,16 +4,16 @@ The fixed test in docs/STUDY.md covers each contract's first bar up to the New Y
 is never re-run on new data. This file applies the same three claims, with the same code and nothing changed, to
 everything recorded after that date. A scheduled job rewrites it every hour, so it keeps growing.
 
-Updated 2026-11-23 15:03 UTC. 353 moves in 58 closed sessions since the fixed test ended.
+Updated 2026-11-23 16:03 UTC. 365 moves in 59 closed sessions since the fixed test ended.
 The first six weeks of this period (to 8 October 2026) were looked at before the rules were fixed; see research/PREREGISTRATION.md.
 
 | | Since the fixed test | Fixed test |
 | --- | ---: | ---: |
-| Moves | 353 | 1,175 |
-| Move after the call, basis points | -12.5 (-60.7 to 31.9) | -3.9 (-23.4 to 15.5) |
-| Moves that held | 64.0% (55.6% to 71.6%) | 63.6% (59.5% to 67.5%) |
-| Prices inside the 80% range | 77.3% (70.2% to 84.1%) | 78.2% (74.8% to 81.6%) |
-| Points a call | 1.77 (-0.58 to 3.88) | 1.51 (0.50 to 2.50) |
+| Moves | 365 | 1,175 |
+| Move after the call, basis points | -0.9 (-52.6 to 48.4) | -3.9 (-23.4 to 15.5) |
+| Moves that held | 64.7% (56.6% to 72.1%) | 63.6% (59.5% to 67.5%) |
+| Prices inside the 80% range | 75.6% (68.0% to 82.8%) | 78.2% (74.8% to 81.6%) |
+| Points a call | 1.92 (-0.35 to 3.98) | 1.51 (0.50 to 2.50) |
 | Timing rule against half and half, basis points | 0.0 (0.0 to 0.0) | 0.0 (-1.7 to 1.6) |
 
 Figures in brackets are 95% intervals from resampling whole closed sessions.
@@ -38,4 +38,4 @@ Every month on record, fixed test and after. No intervals: a single month is a s
 | 2026-08 | 49 | 13 | 79.6% | 63.3% | 95.5 | 87.8% | 6.53 |
 | 2026-09 | 93 | 20 | 72.0% | 62.4% | 49.5 | 76.3% | 3.81 |
 | 2026-10 | 152 | 22 | 62.5% | 48.0% | -27.8 | 79.6% | 1.65 |
-| 2026-11 | 95 | 14 | 56.8% | 50.5% | -49.2 | 72.6% | -0.60 |
+| 2026-11 | 107 | 15 | 59.8% | 54.2% | -5.5 | 67.3% | 0.16 |
